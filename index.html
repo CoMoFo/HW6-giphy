@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Giphy API</title>
+  <script
+  src="https://code.jquery.com/jquery-3.3.1.js"
+  integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+  crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+    <!-- 1. Before you can make any part of our site work, you need to create an array of strings, each one related to a topic that interests you. Save it to a variable called `topics`.
+   * We chose animals for our theme, but you can make a list to your own liking.
+
+2. Your app should take the topics in this array and create buttons in your HTML.
+   * Try using a loop that appends a button for each string in the array. -->
+
+    <!-- Render Buttons -->
+    <div class="container">
+            <h1></h1>
+            <!-- Buttons render here -->
+            <div class = "buttons-view"></div>
+
+        
+            <form id="input-form">
+              <label for="animal-input">Add an animal </label>
+              <input type="text" id="animal-input">
+              <br>
+        
+              <!-- Button triggers new animal to be added -->
+              <input id="add-animal" type="submit" value="Add an animal">
+            </form>
+            <!-- Gifs will get dumped here -->
+            <div id="gifs-view"></div>
+     </div>       
+<script>
+// Button rendering
+var animals = ["Hippos", "Gazelle", "Giraffes", "Lion", "Warthogs", "Meerkats"];
+
+// On click function to add new button.
+$("#add-animal").on("click", function(e){
+e.preventDefault();
+var newAnimal = $("#animal-input").val().trim();
+animals.push(newAnimal);
+renderButtons();
+$("#animal-input").empty();
+return animals;
+});
+
+function renderButtons() {
+
+// Deletes the animals prior to adding new ones
+// (this is necessary otherwise you will have repeat buttons)
+$(".buttons-view").empty();
+// Loops through the array of animals
+for (var i = 0; i < animals.length; i++) {
+
+  // Then dynamicaly generates buttons for each animal in the array
+  // This code $("<button>") is all jQuery needs to create the beginning and end tag. (<button></button>)
+  var a = $("<button>");
+  // Adds a class of movie to our button
+  a.addClass("animal");
+  // Added a data-attribute
+  a.attr("data-name", animals[i]);
+  // Provided the initial button text
+  a.text(animals[i]);
+  // Added the button to the buttons-view div
+  $(".buttons-view").append(a);
+}
+}
+renderButtons();
+
+// Ajax function to get gifs and rating and still image 
+function getGifs(){
+var searchTerm = $(this).attr("data-name");    
+var queryURL = "https://api.giphy.com/v1/gifs/search?&q="+searchTerm+"api_key=fXcSVGRNTY9g7FN60MAdmbswEW6Twvqs";
+
+    $.ajax({
+      url: queryURL,
+      method: "GET"
+    }).then(function(response) {
+      console.log(response);
+      var results = response.data;
+      // Generate 1
+      for (let index = 0; index < animals.length + 1; index++) {
+          
+          
+          var gifUrl= response.data[index].images.original.url;
+          var something = $("<img>").attr("src", gifUrl);
+          $("#gifs-view").prepend(something);
+          
+        }
+        });
+}
+
+//On click function to summon gifs through AJAX function
+$(document.body).on("click", ".animal", function(){
+    $("#gifs-view").empty();
+    var searchTerm = $(this).attr("data-name");    
+    console.log(searchTerm);
+    function getGifs(){
+    var queryURL = "https://api.giphy.com/v1/gifs/search?&q="+searchTerm+"&api_key=fXcSVGRNTY9g7FN60MAdmbswEW6Twvqs";
+    console.log(queryURL);
+    $.ajax({
+      url: queryURL,
+      method: "GET"
+    }).then(function(response) {
+      console.log(response);
+      var results = response.data;
+      for (let index = 0; index < 10; index++) {
+          
+          
+          var gifUrl= results[index].images.original.url;
+          var rating = results[index].rating
+          var ratingText = $("<p>").text("Rating: " + rating);
+          var animalGif= $("<img>").attr("src", gifUrl);
+          animalGif.addClass("clickable")
+          $("#gifs-view").prepend(animalGif);
+          $("#gifs-view").prepend(ratingText);
+        
+        }
+        });
+}
+getGifs();
+
+});
+
+
+
+
+// Form to add buttons
+// Ajax call on giphy click for each button
+// Rating of each gif
+// On click pause and play for each gif
+    
+</script> 
+
+</body>
+
+</html>
