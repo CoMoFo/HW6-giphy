@@ -112,12 +112,19 @@ $(document.body).on("click", ".animal", function(){
       var results = response.data;
       for (let index = 0; index < 10; index++) {
           
-          
+           
+          var stillUrl= results[index].images.original_still.url;
           var gifUrl= results[index].images.original.url;
           var rating = results[index].rating
           var ratingText = $("<p>").text("Rating: " + rating);
-          var animalGif= $("<img>").attr("src", gifUrl);
+          var animalGif= $("<img>").attr("src", stillUrl);
           animalGif.addClass("clickable")
+
+          // Element.setAttribute(name, value); // NOT A FUNCTION NVM
+          animalGif.data("state", "still")
+          animalGif.data("still", stillUrl)
+          animalGif.data("animate", gifUrl)
+
           $("#gifs-view").prepend(animalGif);
           $("#gifs-view").prepend(ratingText);
         
@@ -126,8 +133,22 @@ $(document.body).on("click", ".animal", function(){
 }
 getGifs();
 
-});
 
+
+});
+// Play gif on click
+ $(document.body).on("click", ".clickable", function(){
+        console.log($(this).data("state"));
+        if ($(this).data("state") === "still"){
+        $(this).attr("src", $(this).data("animate")) ;
+        $(this).data("state", "animate");
+       } else {
+         $(this).attr("src", $(this).data("still"));
+         $(this).data("state", "still");
+       }
+
+
+ });
 
 
 
